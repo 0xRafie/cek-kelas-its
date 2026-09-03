@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cek Peserta Kelas — MIA</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  background: linear-gradient(160deg, #0a0e1a, #141b33 60%, #0f1629);
+  color: #e8eaf0;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 32px 16px;
+}
+.wrap { width:100%; max-width:760px; }
+header { margin-bottom: 20px; }
+header h1 { font-size:1.35rem; letter-spacing:-.02em; }
+header .badge {
+  display:inline-block; margin-top:8px; padding:4px 12px; font-size:.7rem; font-weight:700;
+  text-transform:uppercase; letter-spacing:.08em; color:#fff;
+  background:rgba(108,99,255,.35); border-radius:999px; border:1px solid rgba(108,99,255,.5);
+}
+header .me { margin-top:10px; font-size:.78rem; color:#9aa4c8; }
+
+.card {
+  background: rgba(15,22,41,.55);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:16px;
+  padding:20px;
+  box-shadow: 0 20px 50px rgba(0,0,0,.4);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+}
+
+/* login state */
+#loginBox { text-align:center; padding:30px 0; }
+#loginBox p { color:#aab2d8; margin-bottom:16px; }
+#loginHint { min-height:1.3em; font-size:.8rem; color:#ffd28a; margin-top:12px; }
+
+/* picks */
+.pick-group { margin:0 0 14px; }
+.pick-group label { display:block; font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.09em; color:#9aa4c8; margin-bottom:5px; }
+.pick-group select {
+  width:100%; padding:10px 12px; font:inherit; color:#fff;
+  background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.14);
+  border-radius:10px; outline:none;
+}
+.pick-group select:focus { border-color:#6c63ff; box-shadow:0 0 0 3px rgba(108,99,255,.25); }
+.pick-group option { background:#141a30; color:#fff; }
+.pick-group .q-input {
+  width:100%; padding:9px 12px; font:inherit; color:#fff;
+  background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.14);
+  border-radius:10px; outline:none;
+}
+.pick-group .q-input:focus { border-color:#6c63ff; box-shadow:0 0 0 3px rgba(108,99,255,.25); }
+.pick-group .q-input::placeholder { color:#7f88ad; }
+
+.btn {
+  display:block; width:100%; padding:12px; font:inherit; font-weight:700; color:#fff;
+  border:none; border-radius:12px; cursor:pointer;
+  background:linear-gradient(135deg,#6c63ff,#8b5cf6);
+  box-shadow:0 8px 24px rgba(108,99,255,.4);
+}
+.btn:hover { filter:brightness(1.12); }
+.btn:disabled { opacity:.55; cursor:wait; }
+.btn-ghost { background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.25); box-shadow:none; }
+.btn-sm { display:inline-block; width:auto; padding:7px 14px; font-size:.78rem; border-radius:9px; }
+
+#status { min-height:1.3em; font-size:.82rem; color:#9aa4c8; margin:10px 0; }
+
+.result-meta { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px; margin:14px 0 8px; font-size:.82rem; color:#9aa4c8; }
+.result-meta b { color:#fff; }
+
+.table-wrap { overflow-x:auto; border:1px solid rgba(255,255,255,.1); border-radius:12px; background:rgba(0,0,0,.18); }
+table { width:100%; border-collapse:collapse; font-size:.8rem; }
+th {
+  position:sticky; top:0; background:#1b2240; color:#cbd2f0; text-align:left;
+  padding:8px 10px; font-size:.66rem; text-transform:uppercase; letter-spacing:.06em; z-index:1; white-space:nowrap;
+}
+td { padding:7px 10px; border-top:1px solid rgba(255,255,255,.07); white-space:nowrap; }
+tbody tr:nth-child(even) td { background:rgba(255,255,255,.03); }
+tbody tr:hover td { background:rgba(108,99,255,.08); }
+.empty { padding:22px; text-align:center; color:#9aa4c8; }
+.hidden { display:none !important; }
+.footer {
+  margin-top: 18px;
+  text-align: center;
+  font-size: .75rem;
+  color: rgba(255,255,255,.5);
+  letter-spacing: .02em;
+}
+.footer a { color: rgba(255,255,255,.7); text-decoration:none; }
+.footer a:hover { color:#fff; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Cek Peserta Kelas — MIA</h1>
+    <span class="badge">myITS Academics · mia.its.ac.id</span>
+    <p class="me" id="meLine"></p>
+  </header>
+
+  <div class="card">
+    <div id="loginBox">
+      <p>Kamu belum login MIA (atau sesi kedaluwarsa).<br>Klik tombol di bawah, login sekali, ekstensi ini akan mengambilnya otomatis.</p>
+      <button class="btn" id="btnLogin">Login di myITS Academics</button>
+      <div id="loginHint"></div>
+    </div>
+
+    <div id="toolBox" class="hidden">
+      <div class="pick-group">
+        <label for="smt">Semester</label>
+        <select id="smt"></select>
+      </div>
+      <div class="pick-group">
+        <label for="grp">Kelompok Mata Kuliah</label>
+        <select id="grp"></select>
+      </div>
+      <div class="pick-group">
+        <label for="mk">Mata Kuliah</label>
+        <select id="mk"></select>
+      </div>
+      <div class="pick-group">
+        <label for="kelas">Kelas</label>
+        <select id="kelas"></select>
+      </div>
+      <button class="btn" id="btnBuka">Lihat Peserta</button>
+      <div id="status"></div>
+      <div class="pick-group" id="searchGroup" style="display:none">
+        <label for="q">Cari nama / NRP</label>
+        <input id="q" class="q-input" placeholder="mis. 'azra' atau '50522310'" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="result-meta" id="meta" style="display:none">
+        <span id="metaText"></span>
+        <button class="btn btn-ghost btn-sm" id="btnCopy">Salin Nama &amp; NRP</button>
+      </div>
+      <div class="table-wrap" id="tableWrap" style="display:none"></div>
+    </div>
+  </div>
+
+  <div class="footer">
+    &copy; 2026 &middot; <a href="https://github.com/0xRafie" target="_blank" rel="noopener">github.com/0xRafie</a>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

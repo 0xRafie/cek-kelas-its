@@ -1,0 +1,10 @@
+{
+  "manifest_version": 3,
+  "name": "Cek Peserta Kelas — MIA",
+  "description": "Lihat daftar peserta kelas di myITS Academics (mia.its.ac.id) otomatis dari sesi login kamu.",
+  "version": "1.0.0",
+  "permissions": ["cookies"],
+  "host_permissions": ["https://mia.its.ac.id/*"],
+  "background": { "service_worker": "background.js" },
+  "action": { "default_title": "Cek Peserta Kelas MIA" }
+}
